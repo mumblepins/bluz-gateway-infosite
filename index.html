@@ -2,17 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <script type="text/javascript" src="http://cdn.jsdelivr.net/particle-api-js/5/particle.min.js">
+    <title>Bluz Gateway Info</title>
+    <script>
+        // CONFIGURE
+        var gatewayServer = 'chip';
+        var gatewayServerPort = 3000;
+        var refreshInterval = 5; // Seconds
     </script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/particle-api-js/5/particle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="date.format.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cloud.typography.com/6107112/665726/css/fonts.css">
     <style>
-        @import url(http://fonts.googleapis.com/css?family=Raleway);
+
+        body {
+            font-family: "Gotham SSm A", "Gotham SSm B", proxima-nova, "Helvetica Neue", helvetica, arial, sans-serif;
+        }
 
         h2 {
-            background-color: #FEFFED;
+            background-color: #ededed;
             padding: 30px 35px;
-            margin: -10px -50px;
+            margin-top: -10px;
+            margin-right: -50px;
+            margin-left: -50px;
+            /*margin-bottom: -10px;*/
             text-align: center;
             border-radius: 10px 10px 0 0;
         }
@@ -26,29 +39,37 @@
 
         div.formcontainer {
             width: 500px;
-            height: auto;
+            height: 600px;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
             margin: auto auto;
-            font-family: 'Raleway', sans-serif;
+            display: none;
+            z-index: 100;
+            position: absolute;
+            /*font-family: 'Raleway', sans-serif;*/
         }
 
         div.main {
             /*width: 100%;*/
             padding: 10px 50px 25px;
-            border: 2px solid gray;
+            border: 2px solid white;
             border-radius: 10px;
-            font-family: raleway;
+            background-color: ghostwhite;
+            /*font-family: raleway;*/
             /*float: left;*/
             /*clear: right;*/
             /*margin-top: 50px;*/
         }
 
         input[type=text], input[type=password] {
-            width: 100%;
+            width: 95%;
             height: 40px;
-            padding: 5px;
-            margin-bottom: 25px;
-            margin-top: 5px;
-            border: 2px solid #ccc;
+            padding: 2.5%;
+            margin: 5px auto 25px;
+            display: block;
+            border: 1px solid #ccc;
             color: #4f4f4f;
             font-size: 16px;
             border-radius: 5px;
@@ -56,17 +77,35 @@
 
         label {
             color: #464646;
-            text-shadow: 0 1px 0 #fff;
+            /*text-shadow: 0 0.5px 0 #fff;*/
             font-size: 14px;
+            font-weight: 500;
+            display: block;
+            text-align: left;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        #badlogin {
+            color: #cd0018;
+            /*text-shadow: 0 1px 0 #000;*/
+            font-size: 16px;
             font-weight: bold;
+            margin-bottom: 10px;
+            margin-top: -10px;
+            visibility: hidden;
+            text-align: center;
+            display: block;
         }
 
         center {
-            font-size: 32px;
+            font-size: 24px;
         }
 
         .note {
             color: red;
+            font-weight: bold;
+
         }
 
         .valid {
@@ -83,7 +122,8 @@
         }
 
         input[type=submit] {
-            font-size: 16px;
+            display: block;
+            font-size: 14px;
             background: linear-gradient(#ffbc00 5%, #ffdd7f 100%);
             border: 1px solid #e5a900;
             color: #4E4D4B;
@@ -93,17 +133,140 @@
             border-radius: 5px;
             padding: 10px 0;
             outline: none;
-            align-self: center;
-            alignment: center;
-            align-content: center;
         }
 
         input[type=submit]:hover {
             background: linear-gradient(#ffdd7f 5%, #ffbc00 100%);
         }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: 1px solid #c7c7c7;
+            width: 100%;
+        }
+
+        table td, table th {
+            padding: 15px;
+            font-weight: 300;
+            font-size: 12px;
+            border-right: 1px solid #c7c7c7;
+        }
+
+        table thead th {
+            font-weight: 500;
+            text-align: left;
+            color: #777;
+        }
+
+        table thead {
+            background: #f7f7f7;
+            border-bottom: 1px solid #c7c7c7;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Chrome/Safari/Opera */
+            -khtml-user-select: none; /* Konqueror */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+            cursor: default;
+        }
+
+        tr {
+            height: 48px;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid #c7c7c7;
+        }
+
+        table {
+            /*display: block;*/
+            /*border: 0px hidden;*/
+        }
+
+        #login, #logout {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            margin-left: 15px;
+            color: cornflowerblue;
+            display: block;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #login:hover, #logout:hover {
+            color: darkblue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        #logout {
+            display: none;
+        }
+
+        img.up-arrow {
+            float: right;
+
+            display: none;
+            position: relative;
+            /*top: -0px;*/
+            /*visibility: hidden;*/
+        }
+
+        img.down-arrow {
+            float: right;
+            display: none;
+            position: relative;
+            /*bottom: -0px;*/
+            /*visibility: hidden;*/
+        }
+
+        .arrows {
+            /*position:absolute;*/
+            /*right:0;*/
+            float: right;
+            height: 20%;
+            top: -15px;
+            /*display: inline;*/
+            /*width: 30px;*/
+
+        }
+
+        #json-overlay {
+            background-color: #333;
+            opacity: 0.8;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            z-index: 0;
+            display: none;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #options {
+            /*float:right;*/
+            position: absolute;
+            /*display:inline;*/
+            right: 15px;
+            top: 15px;
+        }
+
+        .claim, .unclaim {
+            color: cornflowerblue;
+            cursor: pointer;
+        }
+
+        .claim:hover, .unclaim:hover {
+            color: darkblue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+<div id="json-overlay"></div>
 <div class="formcontainer" id="formcontainer">
     <div class="main">
         <h2>Particle Cloud Login</h2>
@@ -112,66 +275,134 @@
             <input type="text" name="username" id="username"/>
             <label>Password :</label>
             <input type="password" name="password" id="password"/>
-            <input type="submit" value="Login" id="submit" onclick="formsubmit()"/>
+            <div id="badlogin">Bad login, please try again</div>
+            <input type="submit" value="Login" id="submit"/>
         </form>
 
     </div>
 </div>
+<div id="login">Login</div>
+<div id="logout">Logout</div>
+<!--<div id="options"><label id="display-all"><input type="checkbox" >Display All Particle Devices</label></div>-->
 <table id="devicestable">
 
-<tbody>
-<tr>
-    <td class="particle-id-cell table-header">Particle ID</td>
-    <td class="particle-name-cell table-header">Name</td>
-</tr>
-</tbody>
+    <thead>
+    <tr>
+        <th class="particle-id-cell table-header">Particle ID
+            <img src="arrow-up.png" class="up-arrow id" height="20" width="20">
+            <img src="arrow-down.png" class="down-arrow id" height="20" width="20">
+        </th>
+        <th class="particle-name-cell table-header">Name
+            <img src="arrow-up.png" class="up-arrow name" height="20" width="20">
+            <img src="arrow-down.png" class="down-arrow name" height="20" width="20">
+        </th>
+        <th class="rssi-cell table-header">RSSI
+            <img src="arrow-up.png" class="up-arrow rssi" height="20" width="20">
+            <img src="arrow-down.png" class="down-arrow rssi" height="20" width="20">
+        </th>
+        <th class="uptime-cell table-header">Device Uptime (Gateway)
+            <img src="arrow-up.png" class="up-arrow uptime" height="20" width="20">
+            <img src="arrow-down.png" class="down-arrow uptime" height="20" width="20">
+        </th>
+        <th class="last-heard-cell table-header">Last Heard (Particle)
+            <img src="arrow-up.png" class="up-arrow last_heard" height="20" width="20">
+            <img src="arrow-down.png" class="down-arrow last_heard" height="20" width="20">
+        </th>
+        <th class="functions-cell table-header">Functions
+            <!--<img src="arrow-up.png" class="up-arrow fu" height="20" width="20">-->
+            <!--<img src="arrow-down.png" class="down-arrow id" height="20" width="20">-->
+        </th>
+        <th class="variables-cell table-header">Variables
+            <!--<img src="arrow-up.png" class="up-arrow id" height="20" width="20">-->
+            <!--<img src="arrow-down.png" class="down-arrow id" height="20" width="20">-->
+        </th>
+    </tr>
+    </thead>
+    <tbody></tbody>
 </table>
 
 
-<pre id="gwdata"></pre>
-<pre id="clouddata"></pre>
-
-
 <script>
-
+    $(".down-arrow").filter(".id").show();
+    showHideColumns();
     var particle = new Particle();
-    var token;
-    var devicesPr;
-    var gwdiv = document.getElementById('gwdata');
+    var token = null;
 
-    var clouddiv = document.getElementById('clouddata');
-    var formdiv=document.getElementById('formcontainer');
-    $('#form_id').submit(function() {
-        formsubmit();
-        return false;
-    });
+    var devicesPr;
+    //    var gwdiv = document.getElementById('gwdata');
+
+    var devicetable = document.getElementById('devicestable').getElementsByTagName('tbody')[0];
+    var devicesInTable = {};
+    var formSubmitted = false;
+
+    //    var clouddiv = document.getElementById('clouddata');
+    var formdiv = document.getElementById('formcontainer');
+    var badloginDiv = document.getElementById('badlogin');
+
+    var cloudData = null;
+    var gatewayData = null;
+    var allData = null;
+    var sortedData = [];
+    var sortingBy = 'id';
+    var sortingReverse = false;
+    function logoutCloud() {
+
+        localStorage.removeItem('particleToken');
+
+        location.reload();
+    }
+
     function loginToCloud(username, password) {
         particle.login({username: username, password: password}).then(
                 function (data) {
                     formdiv.style.display = 'none';
+
                     console.log('API call completed on promise resolve: ', data.body.access_token);
                     token = data.body.access_token;
-                    devicesPr = particle.listDevices({auth: token});
-                    devicesPr.then(
-                            function (devices) {
-                                //console.log('Devices: ', devices);
-                                var deviceList = parseDevices(devices);
-                                console.log(deviceList);
-                                var devicePromise = getAttributes(deviceList);
-                                devicePromise.then(function (data) {
-                                    console.log(data);
-                                    clouddiv.innerHTML = JSON.stringify(data, null, 2);
-                                });
+                    localStorage.particleToken = token;
+                    retrieveCloudData();
 
-                            },
-                            function (err) {
-                                console.log('List devices call failed: ', err);
-                            }
-                    );
+                    $('#json-overlay').hide();
+                    $('#json-overlay').css('z-index', 1);
+                    $('.formcontainer').hide();
+                    $('.formcontainer').css('z-index', 2);
+                    $('#logout').show();
+                    $('#login').hide();
                 },
                 function (err) {
+                    formSubmitted = false;
                     console.log('API call completed on promise fail: ', err);
-//                    alert("Bad login, please try again");
+                    document.getElementById('badlogin').style.visibility = 'visible';
+                }
+        );
+    }
+
+
+    function retrieveCloudData() {
+        if (token == null) return;
+        console.log('asking for cloud info');
+        devicesPr = particle.listDevices({auth: token});
+        devicesPr.then(
+                function (devices) {
+                    //console.log('Devices: ', devices);
+                    var deviceList = parseDevices(devices, true);
+//                    console.log(deviceList);
+                    var devicePromise = getAttributes(deviceList);
+                    devicePromise.then(function (data) {
+//                        console.log(data);
+//                        clouddiv.innerHTML = JSON.stringify(data, null, 2);
+                        cloudData = data;
+//                        console.log(cloudData);
+                        parseCloudData();
+                        setTimeout(retrieveCloudData, refreshInterval * 1000);
+                    });
+
+                },
+                function (err) {
+                    console.log('List devices call failed: ', err);
+                    if (err.statusCode == 401)
+                        logoutCloud();
+                    setTimeout(retrieveCloudData, refreshInterval * 1000);
                 }
         );
     }
@@ -199,19 +430,23 @@
 
             var promises = [];
             for (var key in devices) {
-                let item = devices[key];
+                var item = devices[key];
 //                console.log(item);
-                promises.push(particle.getDevice({deviceId: item['id'], auth: token}).then(
-                        function (data) {
+                (function (item) {
+                    promises.push(particle.getDevice({deviceId: item['id'], auth: token}).then(
+                            function (data) {
+
+//                                console.log(item);
 //                        console.log('Device attrs retrieved successfully:', data);
 
-                            deviceList[item['id']] = data['body'];
+                                deviceList[item['id']] = data['body'];
 //                        console.log(data);
-                        },
-                        function (err) {
-                            console.log('API call failed: ', err);
-                        }
-                ));
+                            },
+                            function (err) {
+                                console.log('API call failed: ', err);
+                            }
+                    ));
+                })(item);
             }
             Promise.all(promises).then(function (values) {
                 resolve(deviceList);
@@ -222,7 +457,7 @@
     function getGatewayInfo() {
         return new Promise(function (resolve, reject) {
             var request = new XMLHttpRequest();
-            request.open('GET', 'http://localhost:3000/connected-devices');
+            request.open('GET', 'http://' + gatewayServer + ':' + gatewayServerPort + '/connected-devices');
 
 //            request.setRequestHeader('Accept', 'application/json');
             request.onload = function () {
@@ -244,78 +479,295 @@
     function checkGateway() {
         console.log('asking for gateway info');
         getGatewayInfo().then(function (data) {
-            var jsonData = JSON.parse(data);
-            jsondata = parseGatewayInfo(jsonData);
-            setTimeout(checkGateway, 10000);
+            gatewayData = JSON.parse(data);
+            parseGatewayData();
+            setTimeout(checkGateway, refreshInterval * 1000);
         }, function (error) {
             console.log(error);
-            setTimeout(checkGateway, 10000);
+            setTimeout(checkGateway, refreshInterval * 1000);
         });
     }
 
-
-    var devicetable=document.getElementById('devicestable');
-    var devicesInTable={};
-
-    function parseGatewayInfo(info) {
-        var rowsFound = [];
-        for (var key in info) {
-            let bluz = info[key];
-            let totalSec = bluz['uptime'];
-            let hours = parseInt(totalSec / 3600) % 24;
-            let minutes = parseInt(totalSec / 60) % 60;
-            let seconds = Math.round(totalSec % 60);
-
-            let uptime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-
-            let row, particleIdCell, rssiCell, uptimeCell;
-
-            if (devicesInTable[bluz.id] != null) {
-                row=document.getElementById(bluz.id);
-
-                devicesInTable[bluz.id]= row.rowIndex;
-                particleIdCell=row.getElementsByClassName('particle-id-cell')[0];
-                rssiCell=row.getElementsByClassName('rssi-cell')[0];
-                uptimeCell=row.getElementsByClassName('uptime-cell')[0];
-            }
-            else {
-                row = devicetable.insertRow(-1);
-                devicesInTable[bluz.id]= row.rowIndex;
-                row.id=bluz.id;
-                particleIdCell=row.insertCell(0);
-                particleIdCell.className='particle-id-cell';
-                rssiCell=row.insertCell(1);
-                rssiCell.className='rssi-cell';
-                uptimeCell=row.insertCell(2);
-                uptimeCell.className='uptime-cell';
-            }
-            rowsFound.push(bluz.id);
-            particleIdCell.innerHTML = bluz['particle-id'];
-            rssiCell.innerHTML=bluz['rssi'];
-            uptimeCell.innerHTML=uptime;
-
+    function sortBy(key, reverse=false) {
+        var returnList = new Array();
+        if (!allData) {
+            return returnList;
         }
-        for (var key in devicesInTable) {
-            if (rowsFound.indexOf(key) < 0) {
-                delete(devicesInTable[key]);
-                deleteRow(key);
+        for (var partId in allData) {
+            var tempProps = {};
+            tempProps['id'] = partId;
+            for (var prop in allData[partId]) {
+                tempProps[prop] = allData[partId][prop];
             }
+            returnList.push(tempProps);
         }
-        gwdiv.innerHTML=JSON.stringify(info,null,2);
+        if (returnList[0] && key in returnList[0]) {
+//            console.log('bloop');
+            if (!reverse) {
+
+//                console.log(1);
+                returnList.sort(function (a, b) {
+                    if (isString(a)) {
+                        a = a.toUpperCase();
+                    }
+                    if (isString(b)) {
+                        b = b.toUpperCase();
+                    }
+                    if (a[key] < b[key]) {
+                        return -1;
+                    } else if (a[key] > b[key]) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                })
+                returnList.sort();
+            } else {
+//                console.log(2);
+                returnList.sort(function (a, b) {
+                    return b[key] - a[key];
+                })
+            }
+//            console.log(returnList);
+            return returnList;
+        } else {
+
+//            console.log(returnList);
+            return returnList;
+        }
     }
 
-    function deleteRow(rowid)
-    {
+    function isString(myVar) {
+        return (typeof myVar === 'string' || myVar instanceof String);
+    }
+
+    function parseCloudData() {
+        if (!allData)
+            allData = {};
+        for (var key in cloudData) {
+            var device = cloudData[key];
+            if (key in allData) {
+                for (var prop in device) {
+                    allData[key][prop] = device[prop];
+                }
+            }
+        }
+//        console.log(allData)
+//        var sorted = sortBy('name');
+        displayTable();
+    }
+
+    function parseGatewayData() {
+//        console.log(gatewayData);
+        for (var key in allData) {
+            if (allData[key]) {
+                allData[key]['delete'] = true;
+            }
+        }
+        if (!allData)
+            allData = {};
+
+
+        for (var key in gatewayData) {
+            var partId = gatewayData[key]['particle-id'];
+            if (!(partId in allData))
+                allData[partId] = {};
+
+            allData[partId]['gw-id'] = gatewayData[key]['id'];
+            allData[partId]['rssi'] = gatewayData[key]['rssi'];
+            allData[partId]['uptime'] = gatewayData[key]['uptime'];
+            allData[partId]['delete'] = false;
+        }
+
+        for (var key in allData) {
+            if (allData[key]['delete'])
+                delete(allData[key]);
+        }
+
+        displayTable();
+//        console.log(allData);
+//        for (var key in info) {}
+    }
+
+    function changeNumOfRows(num) {
+        var curRows = devicetable.rows.length;
+        while (curRows < num) {
+            var row = devicetable.insertRow(-1);
+
+            var particleIdCell = row.insertCell(0);
+            particleIdCell.className = 'particle-id-cell';
+            var particleNameCell = row.insertCell(1);
+            particleNameCell.className = 'particle-name-cell';
+            var rssiCell = row.insertCell(2);
+            rssiCell.className = 'rssi-cell';
+            var uptimeCell = row.insertCell(3);
+            uptimeCell.className = 'uptime-cell';
+            var lastHeardCell = row.insertCell(4);
+            lastHeardCell.className = 'last-heard-cell';
+            var functionsCell = row.insertCell(5);
+            functionsCell.className = 'functions-cell';
+            var variablesCell = row.insertCell(6);
+            variablesCell.className = 'variables-cell';
+            curRows = devicetable.rows.length;
+        }
+        while (curRows > num) {
+            devicetable.deleteRow(-1);
+            curRows = devicetable.rows.length;
+        }
+    }
+
+    function displayTable() {
+        sortedData = sortBy(sortingBy, sortingReverse);
+        changeNumOfRows(sortedData.length);
+        for (var i = 0; i < sortedData.length; i++) {
+            var device = sortedData[i];
+
+//            console.log(device);
+            var row, particleIdCell, rssiCell, uptimeCell, particleNameCell;
+            var lastHeardCell, functionsCell, variablesCell;
+
+            row = devicetable.rows[i];
+//            console.log(row);
+//            if (devicesInTable[bluz.id] != null) {
+//                devicesInTable[bluz.id] = row.rowIndex;
+            particleIdCell = row.getElementsByClassName('particle-id-cell')[0];
+            rssiCell = row.getElementsByClassName('rssi-cell')[0];
+            uptimeCell = row.getElementsByClassName('uptime-cell')[0];
+            particleNameCell = row.getElementsByClassName('particle-name-cell')[0];
+            lastHeardCell = row.getElementsByClassName('last-heard-cell')[0];
+            functionsCell = row.getElementsByClassName('functions-cell')[0];
+            variablesCell = row.getElementsByClassName('variables-cell')[0];
+//            }
+//            else {
+//                row = devicetable.insertRow(-1);
+//                devicesInTable[bluz.id] = row.rowIndex;
+//                row.id = bluz.id;
+//
+//                //   <td class="particle-id-cell table-header">Particle ID</td>
+//                //   <td class="particle-name-cell table-header">Name</td>
+//                //           <td class="rssi-cell table-header">Signal Strength</td>
+//                //   <td class="uptime-cell table-header">Gateway-Device Uptime</td>
+//                //  <td class="last-heard-cell table-header">Last Heard (Particle)</td>
+//                //  <td class="functions-cell table-header">Functions</td>
+//                //          <td class="variables-cell table-header">Variables</td>
+//
+//                particleIdCell = row.insertCell(0);
+//                particleIdCell.className = 'particle-id-cell';
+//                particleNameCell = row.insertCell(1);
+//                particleNameCell.className = 'particle-name-cell';
+//                rssiCell = row.insertCell(2);
+//                rssiCell.className = 'rssi-cell';
+//                uptimeCell = row.insertCell(3);
+//                uptimeCell.className = 'uptime-cell';
+//                lastHeardCell = row.insertCell(4);
+//                lastHeardCell.className = 'last-heard-cell';
+//                functionsCell = row.insertCell(5);
+//                functionsCell.className = 'functions-cell';
+//                variablesCell = row.insertCell(6);
+//                variablesCell.className = 'variables-cell';
+//            }
+//            rowsFound.push(bluz.id);
+
+            // TODO: Add claiming/unclaiming
+//            var claim = ' (<span class="' + device['id'] + ' claim">Claim</span>)';
+//            var unclaim = ' (<span class="' + device['id'] + ' unclaim">Unclaim</span>)';
+            var claim = '';
+            var unclaim = '';
+
+
+
+            if ('id' in device) {
+                if (token != null) {
+                    if (!('name' in device))
+                        particleIdCell.innerHTML = device['id'] + claim;
+                    else
+                        particleIdCell.innerHTML = device['id'] + unclaim;
+                }
+                else
+                    particleIdCell.innerHTML = device['id']
+            }
+            else
+                particleIdCell.innerHTML = '';
+            if ('rssi' in device)
+                rssiCell.innerHTML = device['rssi'];
+            else
+                rssiCell.innerHTML = '';
+            if ('uptime' in device) {
+                var totalSec = device['uptime'];
+                var hours = parseInt(totalSec / 3600) % 24;
+                var minutes = parseInt(totalSec / 60) % 60;
+                var seconds = Math.round(totalSec % 60);
+
+                uptimeCell.innerHTML = hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+            }
+            else
+                uptimeCell.innerHTML = '';
+
+//            if (cloudData) {
+//                let cloudInfo = cloudData[bluz['-id']];
+//                if (cloudInfo) {
+
+            if ('name' in device)
+                particleNameCell.innerHTML = device['name'];
+            else
+                particleNameCell.innerHTML = '';
+            if ('last_heard' in device) {
+                var lastheard = new Date(device['last_heard']);
+                lastHeardCell.innerHTML = lastheard.format('mmm-d H:MM:ss Z');
+            }
+            else
+                lastHeardCell.innerHTML = '';
+
+            if ('functions' in device)
+                functionsCell.innerHTML = device['functions'];
+            else
+                functionsCell.innerHTML = '';
+            if ('variables' in device) {
+                var variables = [];
+                for (var key in device['variables']) {
+                    variables.push(key);
+                }
+                variablesCell.innerHTML = variables;
+            }
+            else
+                variablesCell.innerHTML = '';
+        }
+        showHideColumns();
+    }
+
+    function showHideColumns() {
+
+        var haveCloudData = false;
+        if (sortedData) {
+            for (var i = 0; i < sortedData.length; i++)
+                if ('name' in sortedData[i])
+                    haveCloudData = true;
+        }
+        if (haveCloudData) {
+//            console.log('show');
+            $('td:nth-child(2),th:nth-child(2)').show();
+            $('td:nth-child(5),th:nth-child(5)').show();
+            $('td:nth-child(6),th:nth-child(6)').show();
+            $('td:nth-child(7),th:nth-child(7)').show();
+        }
+
+        else {
+            $('td:nth-child(2),th:nth-child(2)').hide();
+            $('td:nth-child(5),th:nth-child(5)').hide();
+            $('td:nth-child(6),th:nth-child(6)').hide();
+            $('td:nth-child(7),th:nth-child(7)').hide();
+        }
+    }
+
+    function deleteRow(rowid) {
         var row = document.getElementById(rowid);
         var table = row.parentNode;
-        while ( table && table.tagName != 'TABLE' )
+        while (table && table.tagName != 'TABLE')
             table = table.parentNode;
-        if ( !table )
+        if (!table)
             return;
         table.deleteRow(row.rowIndex);
     }
-
-    checkGateway();
 
     function formsubmit() {
         var username = document.getElementById("username").value;
@@ -323,6 +775,82 @@
         console.log(username);
         console.log(password);
         loginToCloud(username, password);
+    }
+
+    function changeSortingOrder(column) {
+        if (sortingBy != column) {
+            sortingBy = column;
+            sortingReverse = false;
+        }
+        else
+            sortingReverse = !sortingReverse;
+        $('.up-arrow').hide();
+        $('.down-arrow').hide();
+        if (sortingReverse) {
+            $('.up-arrow').filter('.' + column).show();
+        } else {
+            $('.down-arrow').filter('.' + column).show();
+        }
+        displayTable();
+        return false;
+    }
+
+    checkGateway();
+
+    $('#form_id').submit(function () {
+        if (formSubmitted) {
+            return false;
+        }
+        formSubmitted = true;
+//        document.getelementById('submit').disabled=true;
+
+        formsubmit();
+        return false;
+    });
+
+
+    $("th.particle-id-cell").click(function (event) {
+
+        return changeSortingOrder('id');
+    });
+
+    $("th.particle-name-cell").click(function (event) {
+        return changeSortingOrder('name');
+    });
+
+    $("th.rssi-cell").click(function (event) {
+        return changeSortingOrder('rssi');
+    });
+
+    $("th.uptime-cell").click(function (event) {
+        return changeSortingOrder('uptime');
+    });
+
+    $("th.last-heard-cell").click(function (event) {
+        return changeSortingOrder('last_heard');
+    });
+
+
+    $('#logout').click(function (event) {
+        logoutCloud();
+        return false;
+    });
+
+    $('#login').click(function (event) {
+        $('#json-overlay').show();
+        $('#json-overlay').css('z-index', 9998);
+        $('.formcontainer').show();
+        $('.formcontainer').css('z-index', 9999);
+        return false;
+    })
+
+    if (localStorage.particleToken) {
+        token = localStorage.particleToken;
+        $('#login').hide();
+        $('#logout').show();
+        formdiv.style.display = 'none';
+
+        retrieveCloudData();
     }
 </script>
 </body>
