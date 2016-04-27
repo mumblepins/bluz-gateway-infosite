@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://cdn.jsdelivr.net/particle-api-js/5/particle.min.js">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <style>
+        @import url(http://fonts.googleapis.com/css?family=Raleway);
+
+        h2 {
+            background-color: #FEFFED;
+            padding: 30px 35px;
+            margin: -10px -50px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        hr {
+            margin: 10px -50px;
+            border: 0;
+            border-top: 1px solid #ccc;
+            /*margin-bottom: 40px;*/
+        }
+
+        div.formcontainer {
+            width: 500px;
+            height: auto;
+            margin: auto auto;
+            font-family: 'Raleway', sans-serif;
+        }
+
+        div.main {
+            /*width: 100%;*/
+            padding: 10px 50px 25px;
+            border: 2px solid gray;
+            border-radius: 10px;
+            font-family: raleway;
+            /*float: left;*/
+            /*clear: right;*/
+            /*margin-top: 50px;*/
+        }
+
+        input[type=text], input[type=password] {
+            width: 100%;
+            height: 40px;
+            padding: 5px;
+            margin-bottom: 25px;
+            margin-top: 5px;
+            border: 2px solid #ccc;
+            color: #4f4f4f;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        label {
+            color: #464646;
+            text-shadow: 0 1px 0 #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        center {
+            font-size: 32px;
+        }
+
+        .note {
+            color: red;
+        }
+
+        .valid {
+            color: green;
+        }
+
+        .back {
+            text-decoration: none;
+            border: 1px solid rgb(0, 143, 255);
+            background-color: rgb(0, 214, 255);
+            padding: 3px 20px;
+            border-radius: 2px;
+            color: black;
+        }
+
+        input[type=submit] {
+            font-size: 16px;
+            background: linear-gradient(#ffbc00 5%, #ffdd7f 100%);
+            border: 1px solid #e5a900;
+            color: #4E4D4B;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            padding: 10px 0;
+            outline: none;
+            align-self: center;
+            alignment: center;
+            align-content: center;
+        }
+
+        input[type=submit]:hover {
+            background: linear-gradient(#ffdd7f 5%, #ffbc00 100%);
+        }
+    </style>
+</head>
+<body>
+<div class="formcontainer" id="formcontainer">
+    <div class="main">
+        <h2>Particle Cloud Login</h2>
+        <form id="form_id" method="post" name="myform">
+            <label>User Name :</label>
+            <input type="text" name="username" id="username"/>
+            <label>Password :</label>
+            <input type="password" name="password" id="password"/>
+            <input type="submit" value="Login" id="submit" onclick="formsubmit()"/>
+        </form>
+
+    </div>
+</div>
+<table id="devicestable">
+
+<tbody>
+<tr>
+    <td class="particle-id-cell table-header">Particle ID</td>
+    <td class="particle-name-cell table-header">Name</td>
+</tr>
+</tbody>
+</table>
+
+
+<pre id="gwdata"></pre>
+<pre id="clouddata"></pre>
+
+
+<script>
+
+    var particle = new Particle();
+    var token;
+    var devicesPr;
+    var gwdiv = document.getElementById('gwdata');
+
+    var clouddiv = document.getElementById('clouddata');
+    var formdiv=document.getElementById('formcontainer');
+    $('#form_id').submit(function() {
+        formsubmit();
+        return false;
+    });
+    function loginToCloud(username, password) {
+        particle.login({username: username, password: password}).then(
+                function (data) {
+                    formdiv.style.display = 'none';
+                    console.log('API call completed on promise resolve: ', data.body.access_token);
+                    token = data.body.access_token;
+                    devicesPr = particle.listDevices({auth: token});
+                    devicesPr.then(
+                            function (devices) {
+                                //console.log('Devices: ', devices);
+                                var deviceList = parseDevices(devices);
+                                console.log(deviceList);
+                                var devicePromise = getAttributes(deviceList);
+                                devicePromise.then(function (data) {
+                                    console.log(data);
+                                    clouddiv.innerHTML = JSON.stringify(data, null, 2);
+                                });
+
+                            },
+                            function (err) {
+                                console.log('List devices call failed: ', err);
+                            }
+                    );
+                },
+                function (err) {
+                    console.log('API call completed on promise fail: ', err);
+//                    alert("Bad login, please try again");
+                }
+        );
+    }
+
+    function parseDevices(devices, connected) {
+        var deviceList = {};
+        if (connected == null) {
+            connected = false;
+        }
+        devices['body'].forEach(function (item, index, array) {
+            if (connected) {
+                if (item['connected']) {
+                    deviceList[item['id']] = item;
+                }
+            } else {
+                deviceList[item['id']] = item;
+            }
+        });
+        return deviceList;
+    }
+
+    function getAttributes(devices) {
+        return new Promise(function (resolve, reject) {
+            var deviceList = {};
+
+            var promises = [];
+            for (var key in devices) {
+                let item = devices[key];
+//                console.log(item);
+                promises.push(particle.getDevice({deviceId: item['id'], auth: token}).then(
+                        function (data) {
+//                        console.log('Device attrs retrieved successfully:', data);
+
+                            deviceList[item['id']] = data['body'];
+//                        console.log(data);
+                        },
+                        function (err) {
+                            console.log('API call failed: ', err);
+                        }
+                ));
+            }
+            Promise.all(promises).then(function (values) {
+                resolve(deviceList);
+            });
+        });
+    }
+
+    function getGatewayInfo() {
+        return new Promise(function (resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open('GET', 'http://localhost:3000/connected-devices');
+
+//            request.setRequestHeader('Accept', 'application/json');
+            request.onload = function () {
+                if (request.status == 200) {
+                    resolve(request.response); // we get the data here, so resolve the Promise
+                } else {
+                    reject(Error(request.statusText)); // if status is not 200 OK, reject.
+                }
+            };
+
+            request.onerror = function () {
+                reject(Error("Error fetching data.")); // error occurred, so reject the Promise
+            };
+
+            request.send(); // send the request
+        })
+    }
+
+    function checkGateway() {
+        console.log('asking for gateway info');
+        getGatewayInfo().then(function (data) {
+            var jsonData = JSON.parse(data);
+            jsondata = parseGatewayInfo(jsonData);
+            setTimeout(checkGateway, 10000);
+        }, function (error) {
+            console.log(error);
+            setTimeout(checkGateway, 10000);
+        });
+    }
+
+
+    var devicetable=document.getElementById('devicestable');
+    var devicesInTable={};
+
+    function parseGatewayInfo(info) {
+        var rowsFound = [];
+        for (var key in info) {
+            let bluz = info[key];
+            let totalSec = bluz['uptime'];
+            let hours = parseInt(totalSec / 3600) % 24;
+            let minutes = parseInt(totalSec / 60) % 60;
+            let seconds = Math.round(totalSec % 60);
+
+            let uptime = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+
+            let row, particleIdCell, rssiCell, uptimeCell;
+
+            if (devicesInTable[bluz.id] != null) {
+                row=document.getElementById(bluz.id);
+
+                devicesInTable[bluz.id]= row.rowIndex;
+                particleIdCell=row.getElementsByClassName('particle-id-cell')[0];
+                rssiCell=row.getElementsByClassName('rssi-cell')[0];
+                uptimeCell=row.getElementsByClassName('uptime-cell')[0];
+            }
+            else {
+                row = devicetable.insertRow(-1);
+                devicesInTable[bluz.id]= row.rowIndex;
+                row.id=bluz.id;
+                particleIdCell=row.insertCell(0);
+                particleIdCell.className='particle-id-cell';
+                rssiCell=row.insertCell(1);
+                rssiCell.className='rssi-cell';
+                uptimeCell=row.insertCell(2);
+                uptimeCell.className='uptime-cell';
+            }
+            rowsFound.push(bluz.id);
+            particleIdCell.innerHTML = bluz['particle-id'];
+            rssiCell.innerHTML=bluz['rssi'];
+            uptimeCell.innerHTML=uptime;
+
+        }
+        for (var key in devicesInTable) {
+            if (rowsFound.indexOf(key) < 0) {
+                delete(devicesInTable[key]);
+                deleteRow(key);
+            }
+        }
+        gwdiv.innerHTML=JSON.stringify(info,null,2);
+    }
+
+    function deleteRow(rowid)
+    {
+        var row = document.getElementById(rowid);
+        var table = row.parentNode;
+        while ( table && table.tagName != 'TABLE' )
+            table = table.parentNode;
+        if ( !table )
+            return;
+        table.deleteRow(row.rowIndex);
+    }
+
+    checkGateway();
+
+    function formsubmit() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        console.log(username);
+        console.log(password);
+        loginToCloud(username, password);
+    }
+</script>
+</body>
+</html>
